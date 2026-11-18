@@ -64,7 +64,16 @@ select, textarea { font: inherit; }
 .optional { display: contents; font-weight: 400; color: #7e8a9c; }
 .catalog-form .checkbox-label { flex-direction: row; align-items: center; gap: 10px; }
 .checkbox-label input { width: 18px; height: 18px; accent-color: #e7693b; margin: 0; }
-.field-help { margin: -10px 0 0; color: #778394; font-size: 12px; font-weight: 400; }
+.field-help {
+  margin: 10px 0 14px;
+  color: #778394;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
 .catalog-form .error { margin-top: 18px; }
 .dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
 .dialog-actions .primary { margin: 0; padding: 12px 24px; font-size: 14px; }
