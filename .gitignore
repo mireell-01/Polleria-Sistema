@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.local
+CUENTAS-PRUEBA.local.json
+.firebase-setup.local*
+*.log
+*.tsbuildinfo
+.DS_Store
