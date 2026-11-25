@@ -90,3 +90,24 @@
 @media (max-width: 1100px) { .kitchen-board { grid-template-columns: 1fr; } .kitchen-column { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px; } .kitchen-column > h2 { grid-column: 1 / -1; margin-bottom: 0; } .kitchen-ticket { margin: 0; } }
 @media (max-width: 650px) { .report-columns { grid-template-columns: 1fr; } .cart-line { flex-wrap: wrap; } .quantity-control { margin-left: auto; } .order-dialog .catalog-filters { flex-direction: column; } .order-card { padding: 17px; } .report-filters > label { width: 100%; } .report-filters button { flex: 1; } }
 @media print { body > *:not(.print-receipt) { display: none !important; } .print-receipt { display: block; margin: 0 auto; padding: 20px; width: 100%; max-width: 620px; color: #000; font-family: Arial, sans-serif; } .print-receipt h2, .print-receipt h3 { margin: 10px 0; } .print-receipt .order-lines li { break-inside: avoid; } body { background: #fff; } }
+
+/* Pantalla completa de cocina: solo las comandas, sin barra lateral y con letra más grande. */
+.kitchen-toolbar { display: flex; justify-content: flex-end; }
+.kitchen-focus-button { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #1f2734; border: 1px solid #dfe2e9; border-radius: 10px; padding: 11px 16px; font-weight: 700; font-size: 14px; }
+.kitchen-focus-button:hover { border-color: #ec6a3c; color: #c5552c; }
+.kitchen-focus-page { min-height: 100vh; background: #f7f8fa; padding: 18px clamp(12px, 2vw, 28px) 28px; }
+.kitchen-focus-bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; background: #fff; border: 1px solid #eaedf2; border-radius: 14px; padding: 12px 16px; }
+.kitchen-focus-title { display: flex; align-items: center; gap: 12px; }
+.kitchen-focus-title strong { display: block; font-family: Outfit, Arial, sans-serif; font-size: 22px; }
+.kitchen-focus-title small { color: #8c94a2; font-size: 13px; }
+.kitchen-focus-clock { font-family: Outfit, Arial, sans-serif; font-size: 30px; font-weight: 700; color: #1f2734; }
+.kitchen-focus .kitchen-column > h2 { font-size: 21px; }
+.kitchen-focus .kitchen-column > h2 span { font-size: 15px; }
+.kitchen-focus .ticket-heading h3 { font-size: 26px; }
+.kitchen-focus .ticket-heading > span { font-size: 14px; font-weight: 700; }
+.kitchen-focus .batch-label { font-size: 15px; }
+.kitchen-focus .kitchen-items li { font-size: 19px; }
+.kitchen-focus .kitchen-items li b { font-size: 18px; }
+.kitchen-focus .order-notes { font-size: 16px; }
+.kitchen-focus .kitchen-ticket .primary { font-size: 15px; padding: 14px 8px; }
+@media (max-width: 650px) { .kitchen-focus-clock { order: -1; width: 100%; } .kitchen-focus-button { width: 100%; justify-content: center; } }

@@ -25,10 +25,34 @@ function Login() {
   async function submit(e: React.FormEvent) { e.preventDefault(); setError('');setLoading(true); try {await signInWithEmailAndPassword(auth,email,password);} catch {setError('No se pudo ingresar. Revisa el correo, la contraseña y que el usuario esté creado en Firebase Authentication.');} finally{setLoading(false);} }
   return <main className="login-page"><section className="login-panel"><div className="brand-title"><span className="logo"><Flame size={27}/></span><div><strong>BrasaGest</strong><small>Gestión inteligente para pollerías</small></div></div><div className="welcome"><span className="eyebrow">SISTEMA DE GESTIÓN</span><h1>¡Bienvenido de nuevo!</h1><p>Accede al panel de tu establecimiento con tus credenciales.</p></div>{!configured&&<div className="notice"><CircleAlert size={18}/> Primero configura el archivo .env con los datos de Firebase, incluida VITE_FIREBASE_DATABASE_URL.</div>}<form onSubmit={submit}><label>Correo electrónico<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="ejemplo@polleria.com"/></label><label>Contraseña<input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/></label>{error&&<p className="error">{error}</p>}<button className="primary" disabled={loading||!configured}>{loading?'Ingresando...':'Iniciar sesión'}</button></form><p className="footnote">Acceso exclusivo para personal autorizado</p></section><aside className="login-visual"><div className="visual-inner"><span className="visual-icon"><ChefHat size={42}/></span><h2>Cada pedido, bajo control.</h2><p>Mesas, comandas, cocina y caja conectadas en un solo lugar.</p><div className="preview"><span>01 · Pedido recibido</span><span>02 · En preparación</span><span>03 · Listo para entregar</span></div></div></aside></main>;
 }
+const FOCUS_KEY = 'brasagest-cocina-pantalla-completa';
+function readFocus() { try { return localStorage.getItem(FOCUS_KEY) === '1'; } catch { return false; } }
+function saveFocus(on: boolean) { try { if (on) localStorage.setItem(FOCUS_KEY, '1'); else localStorage.removeItem(FOCUS_KEY); } catch { /* sin almacenamiento */ } }
+
 function Dashboard({user,profile}:{user:User;profile:Profile}){
-  const [selectedModule,setSelected] = useState<string>('Panel general');
+  const [selectedModule,setSelected] = useState<string>(() => readFocus() ? 'Pantalla de cocina' : 'Panel general');
   const allowed = modules.filter(m=>profile.rol==='administrador'||m.role===profile.rol);
   const selected = allowed.some(m => m.title === selectedModule) ? selectedModule : allowed[0].title;
+
+  // Pantalla completa de cocina: oculta la barra lateral y, si el navegador lo permite,
+  // también las barras del navegador. Se recuerda al recargar (útil en la pantalla de la cocina).
+  const [kitchenFocus,setKitchenFocus] = useState(readFocus);
+  function toggleKitchenFocus() {
+    const on = !kitchenFocus;
+    setKitchenFocus(on); saveFocus(on);
+    if (on) document.documentElement.requestFullscreen?.().catch(() => {});
+    else if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+  }
+  useEffect(() => {
+    // Si sale con la tecla Esc, también se sale del modo cocina.
+    const onChange = () => { if (!document.fullscreenElement) { setKitchenFocus(false); saveFocus(false); } };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
+  if (kitchenFocus && selected === 'Pantalla de cocina') {
+    return <main className="kitchen-focus-page"><Kitchen focus onToggleFocus={toggleKitchenFocus}/></main>;
+  }
+
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand-title"><span className="logo"><Flame size={25}/></span><div><strong>BrasaGest</strong><small>Panel de gestión</small></div></div>
@@ -39,7 +63,7 @@ function Dashboard({user,profile}:{user:User;profile:Profile}){
     <main className="main"><header className="topbar"><span><PanelTop size={17}/> Sistema de pollería <b>/</b> {selected}</span><span className="dot-status">Sesión activa</span></header>
       <section className="content"><span className="eyebrow">PANEL DE CONTROL</span><h1>{selected}</h1>
         <p className="subhead">{selected === 'Mesas y productos' ? 'Todo listo para organizar tu salón y preparar la carta.' : <>Hola, {profile.nombre}. Has iniciado sesión con el rol <strong>{profile.rol}</strong>.</>}</p>
-        {selected === 'Mesas y productos' && profile.rol === 'administrador' ? <Catalog/> : selected === 'Pedidos en sala' ? <Floor role={profile.rol}/> : selected === 'Pantalla de cocina' ? <Kitchen/> : selected === 'Caja y pagos' ? <Cashier/> : selected === 'Reportes' && profile.rol === 'administrador' ? <Reports/> : <>
+        {selected === 'Mesas y productos' && profile.rol === 'administrador' ? <Catalog/> : selected === 'Pedidos en sala' ? <Floor role={profile.rol}/> : selected === 'Pantalla de cocina' ? <Kitchen onToggleFocus={toggleKitchenFocus}/> : selected === 'Caja y pagos' ? <Cashier/> : selected === 'Reportes' && profile.rol === 'administrador' ? <Reports/> : <>
           <Overview/>
           <div className="hero"><div><span className="hero-label"><ShieldCheck size={15}/> Operación en tiempo real</span><h2>Del pedido al cobro, en un solo lugar</h2><p>Organiza tu salón, envía los pedidos a cocina, registra los pagos y consulta las ventas del día.</p><button className="primary" onClick={() => setSelected('Pedidos en sala')}>Abrir pedidos en sala</button></div><div className="hero-emblem"><Flame size={58}/></div></div>
           <h3>Módulos del sistema</h3><div className="cards">{allowed.filter(m => m.title !== 'Panel general').map(m => <article key={m.title} className="module-card"><span className="module-icon"><m.icon size={24}/></span><h4>{m.title}</h4><p>{m.desc}</p><button className="text-button" onClick={() => setSelected(m.title)}>Abrir módulo →</button></article>)}</div>
